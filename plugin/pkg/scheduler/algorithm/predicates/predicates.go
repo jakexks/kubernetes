@@ -42,6 +42,7 @@ import (
 	"k8s.io/metrics/pkg/client/clientset_generated/clientset"
 
 	"github.com/golang/glog"
+	"github.com/kr/pretty"
 )
 
 const (
@@ -409,6 +410,8 @@ func (c *VolumeZoneChecker) predicate(pod *v1.Pod, meta algorithm.PredicateMetad
 		return true, nil, nil
 	}
 
+	fmt.Printf("jakexks: nodeConstraints: %# v\n", pretty.Formatter(nodeConstraints))
+
 	namespace := pod.Namespace
 	manifest := &(pod.Spec)
 	for i := range manifest.Volumes {
@@ -442,7 +445,9 @@ func (c *VolumeZoneChecker) predicate(pod *v1.Pod, meta algorithm.PredicateMetad
 			}
 
 			for k, v := range pv.ObjectMeta.Labels {
+				fmt.Printf("jakexks: Examining label %v = %v\n", k, v)
 				if k != kubeletapis.LabelZoneFailureDomain && k != kubeletapis.LabelZoneRegion {
+					fmt.Printf("jakexks: couldn't find LabelZoneFailureDomain or LabelZoneRegion (expected %v or %v)\n", kubeletapis.LabelZoneFailureDomain, kubeletapis.LabelZoneFailureDomain)
 					continue
 				}
 				nodeV, _ := nodeConstraints[k]
