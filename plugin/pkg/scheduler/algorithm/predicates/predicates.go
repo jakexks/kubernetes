@@ -384,9 +384,11 @@ func NewVolumeZonePredicate(pvInfo PersistentVolumeInfo, pvcInfo PersistentVolum
 }
 
 func (c *VolumeZoneChecker) predicate(pod *v1.Pod, meta algorithm.PredicateMetadata, nodeInfo *schedulercache.NodeInfo) (bool, []algorithm.PredicateFailureReason, error) {
+	fmt.Printf("jakexks: Entering VolumeZoneChecker predicate\n")
 	// If a pod doesn't have any volume attached to it, the predicate will always be true.
 	// Thus we make a fast path for it, to avoid unnecessary computations in this case.
 	if len(pod.Spec.Volumes) == 0 {
+		fmt.Printf("jakexks: Pod has no volumes %# v\n", pretty.Formatter(pod.Spec.Volumes))
 		return true, nil, nil
 	}
 
@@ -407,6 +409,7 @@ func (c *VolumeZoneChecker) predicate(pod *v1.Pod, meta algorithm.PredicateMetad
 		// The node has no zone constraints, so we're OK to schedule.
 		// In practice, when using zones, all nodes must be labeled with zone labels.
 		// We want to fast-path this case though.
+		fmt.Printf("jakexks: node %s has no zone constraints\n", node.ObjectMeta.Name)
 		return true, nil, nil
 	}
 
@@ -464,7 +467,7 @@ func (c *VolumeZoneChecker) predicate(pod *v1.Pod, meta algorithm.PredicateMetad
 			}
 		}
 	}
-
+	fmt.Printf("jakexks: fell through volume zone checker predicate\n")
 	return true, nil, nil
 }
 
